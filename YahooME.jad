@@ -1,0 +1,8 @@
+MIDlet-1: YahooME,/yahoome.png,net.thauvin.j2me.yahoome.YahooME
+MIDlet-Jar-URL: YahooME.jar
+MIDlet-Icon: /yahoome.png
+MIDlet-Version: 0.1
+MIDlet-Description: YahooME
+MIDlet-Name: YahooME
+MIDlet-Vendor: Erik C. Thauvin
+MIDlet-Info-URL: http://mobile.thauvin.net/j2me/

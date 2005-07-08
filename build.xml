@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project name="YahooME" default="build" basedir=".">
+	<taskdef resource="antenna.properties"/>
+
+	<property environment="env"/>
+	<property name="wtk.home" value="${env.WTK_HOME}"/>
+	<property name="path.build" value="build"/>
+	<property name="path.classes" value="${path.build}/classes"/>
+	<property name="path.src" value="src"/>
+	<property name="path.res" value="res"/>
+	<property name="path.deploy" value="deployed"/>
+	<property name="path.lib" value="lib"/>
+	
+	<path id="path.class">
+		<fileset dir="${path.lib}">	
+			<include name="**/*.jar"/>
+			<exclude name="midpapi20.jar"/>
+		</fileset>
+	</path>
+	<path id="path-2.class">
+		<fileset dir="${path.lib}">	
+			<include name="**/*.jar"/>
+			<exclude name="midpapi10.jar"/>
+		</fileset>
+	</path>	
+	
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${path.build}"/>
+		<mkdir dir="${path.deploy}"/>
+	</target>
+	
+	<target name="compile" depends="init" description="Compiles MIDP 1.x sources">
+		<mkdir dir="${path.classes}"/>
+		<touch>
+			<fileset dir="midp-1"/>
+		</touch>
+		<wtkbuild destdir="${path.classes}" bootclasspathref="path.class" preverify="false">
+			<src path="${path.src}"/>
+			<src path="midp-1"/>
+		</wtkbuild>
+	</target>
+	
+	<target name="compile-2" depends="init" description="Compiles MIDP 2.x sources">
+		<mkdir dir="${path.classes}"/>
+		<touch>
+			<fileset dir="midp-2"/>
+		</touch>
+		<wtkbuild destdir="${path.classes}" bootclasspathref="path-2.class" preverify="false">
+			<src path="${path.src}"/>
+			<src path="midp-2"/>
+		</wtkbuild>
+	</target>
+	
+	<target name="jar" depends="compile" description="Builds the MIDP 1.x jar">
+		<property name="wtk.midp.version" value="1.0"/>
+		<copy todir="${path.deploy}" file="${ant.project.name}.jad"/>
+		<wtkpackage jarfile="${path.deploy}/${ant.project.name}.jar"
+					jadfile="${path.deploy}/${ant.project.name}.jad"
+					obfuscate="true"
+					preverify="true"
+					bootclasspathref="path.class">
+			<fileset dir="${path.classes}"/>
+			<fileset dir="${path.res}" includes="*.png"/>
+		</wtkpackage>
+	</target>
+	
+	<target name="jar-2" depends="compile-2" description="Builds the MIDP 2.x jar">
+		<property name="wtk.midp.version" value="2.0"/>
+		<copy todir="${path.deploy}" file="${ant.project.name}-2.jad"/>
+		<wtkpackage jarfile="${path.deploy}/${ant.project.name}-2.jar"
+					jadfile="${path.deploy}/${ant.project.name}-2.jad"
+					obfuscate="true"
+					preverify="true"
+					bootclasspathref="path-2.class">
+			<fileset dir="${path.classes}"/>
+			<fileset dir="${path.res}" includes="*.png"/>
+		</wtkpackage>
+	</target>
+	
+	<target name="run" description="Execute the MIDP 1.x midlet">
+		<wtkrun jadfile="${path.deploy}/${ant.project.name}.jad" device="DefaultColorPhone" wait="true"/>
+	</target>
+
+	<target name="run-2" description="Execute the MIDP 2.x midlet">
+		<wtkrun jadfile="${path.deploy}/${ant.project.name}-2.jad" device="DefaultColorPhone" wait="true"/>
+	</target>
+	
+	<target name="build" depends="jar,clean,jar-2" description="Rebuilds project">
+	</target>
+	
+	<target name="clean" depends="init" description="Removes classses">
+		<delete quiet="true" includeEmptyDirs="true">
+			<fileset dir="${path.build}" includes="*,*/**"/>
+		</delete>
+	</target>
+</project>
